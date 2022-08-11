@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/tuya/tuya-pulsar-sdk-go/pkg/tylog"
+	"github.com/pepper-iot/tuya-pulsar-sdk-go/pkg/tylog"
 
 	"github.com/tuya/pulsar-client-go/core/manage"
 	"github.com/tuya/pulsar-client-go/core/msg"

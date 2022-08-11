@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/tuya/tuya-pulsar-sdk-go/pkg/tylog"
+	"github.com/pepper-iot/tuya-pulsar-sdk-go/pkg/tylog"
 )
 
 func TestConsumerStop(t *testing.T) {

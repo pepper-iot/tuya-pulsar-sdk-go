@@ -23,9 +23,9 @@ import (
 	"encoding/json"
 	"time"
 
-	pulsar "github.com/tuya/tuya-pulsar-sdk-go"
-	"github.com/tuya/tuya-pulsar-sdk-go/pkg/tylog"
-	"github.com/tuya/tuya-pulsar-sdk-go/pkg/tyutils"
+	pulsar "github.com/pepper-iot/tuya-pulsar-sdk-go"
+	"github.com/pepper-iot/tuya-pulsar-sdk-go/pkg/tylog"
+	"github.com/pepper-iot/tuya-pulsar-sdk-go/pkg/tyutils"
 	"github.com/sirupsen/logrus"
 )
 
@@ -88,7 +88,7 @@ func (h *helloHandler) HandlePayload(ctx context.Context, msg *pulsar.Message, p
 
 1. Make sure that the accessID and accessKey are correct.
 2. Make sure that the Pulsar address is correct, you should use `pulsar://mqe.tuyaus.com:7285` instead of
-`pulsar+ssl://mqe.tuyaus.com:7285`.
+   `pulsar+ssl://mqe.tuyaus.com:7285`.
 3. Make sure that the SDK code version you use is the latest.
 
 ## About debug
@@ -104,6 +104,7 @@ func main(){
 
 Through the following code, you can see the log information of `tuya_pulsar_go_sdk`.
 At the same time, the log will be saved in the `logs/sdk.log` file.
+
 ```
 func main(){
 	tylog.SetGlobalLog("sdk", false)
@@ -111,15 +112,16 @@ func main(){
 ```
 
 In a formal environment, you may not want the SDK logs to be output to the terminal. It is recommended that you use the following code to output the log to a file.
+
 ```
 func main(){
 	tylog.SetGlobalLog("sdk", true)
 }
 ```
+
 ## Support
 
 You can get support from Tuya with the following methods:
 
 - Tuya Smart Help Center: [https://support.tuya.com/en/help](https://support.tuya.com/en/help)
 - Technical Support Council: [https://iot.tuya.com/council](https://iot.tuya.com/council)
-

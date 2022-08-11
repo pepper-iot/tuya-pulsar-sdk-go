@@ -5,9 +5,10 @@ import (
 	"encoding/base64"
 	"encoding/json"
 
-	pulsar "github.com/tuya/tuya-pulsar-sdk-go"
-	"github.com/tuya/tuya-pulsar-sdk-go/pkg/tylog"
-	"github.com/tuya/tuya-pulsar-sdk-go/pkg/tyutils"
+	pulsar "github.com/pepper-iot/tuya-pulsar-sdk-go"
+	"github.com/pepper-iot/tuya-pulsar-sdk-go/pkg/tylog"
+	"github.com/pepper-iot/tuya-pulsar-sdk-go/pkg/tyutils"
+	"github.com/tuya/pulsar-client-go/core/manage"
 )
 
 func main() {
@@ -25,8 +26,9 @@ func main() {
 
 	// create consumer
 	csmCfg := pulsar.ConsumerConfig{
-		Topic: topic,
-		Auth:  pulsar.NewAuthProvider(accessID, accessKey),
+		Topic:            topic,
+		Auth:             pulsar.NewAuthProvider(accessID, accessKey),
+		SubscriptionMode: manage.SubscriptionModeShard,
 	}
 	csm, _ := c.NewConsumer(csmCfg)
 
