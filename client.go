@@ -86,7 +86,7 @@ func (c *client) NewConsumer(config ConsumerConfig) (Consumer, error) {
 			Errs: errs,
 		},
 		Topic:              config.Topic,
-		SubMode:            manage.SubscriptionModeFailover,
+		SubMode:            config.SubscriptionMode,
 		Name:               subscriptionName(config.Topic),
 		NewConsumerTimeout: time.Minute,
 	}
