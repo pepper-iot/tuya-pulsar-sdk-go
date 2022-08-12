@@ -57,7 +57,7 @@ func (c *consumerImpl) ReceiveAndHandle(ctx context.Context, handler PayloadHand
 }
 
 func (c *consumerImpl) Handler(ctx context.Context, handler PayloadHandler, m *Message) {
-	var diag map[string]interface{}
+	diag := map[string]interface{}{}
 	diag["msgID"] = m.Msg.GetMessageId()
 	diag["topic"] = m.Topic
 	defer func(start time.Time) {
