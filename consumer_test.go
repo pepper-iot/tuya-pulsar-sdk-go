@@ -2,15 +2,13 @@ package pulsar
 
 import (
 	"context"
-	"log"
 	"testing"
 	"time"
 
-	"github.com/pepper-iot/tuya-pulsar-sdk-go/pkg/tylog"
+	"github.com/rs/zerolog/log"
 )
 
 func TestConsumerStop(t *testing.T) {
-	tylog.SetGlobalLog("sdk", false)
 	accessID := "xxx"
 	accessKey := "xxx"
 	topic := TopicForAccessID(accessID)
@@ -40,7 +38,7 @@ func TestConsumerStop(t *testing.T) {
 	now := time.Now()
 	csm.Stop()
 	since := time.Since(now)
-	log.Println(since)
+	log.Debug().Msgf("since: %s", since)
 	if since > sleep+time.Second {
 		t.Error("stop failed")
 	}
@@ -52,8 +50,8 @@ type helloHandler struct {
 }
 
 func (h *helloHandler) HandlePayload(ctx context.Context, msg *Message, payload []byte) error {
-	tylog.Info("received message and sleep...", tylog.Any("messageID", msg.Msg.GetMessageId()))
+	log.Info().Interface("messageID", msg.Msg.GetMessageId()).Msg("received message and sleep...")
 	time.Sleep(h.Sleep)
-	tylog.Info("finish message", tylog.Any("messageID", msg.Msg.GetMessageId()))
+	log.Info().Interface("messageID", msg.Msg.GetMessageId()).Msg("finish message")
 	return nil
 }

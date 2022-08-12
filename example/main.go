@@ -6,14 +6,12 @@ import (
 	"encoding/json"
 
 	pulsar "github.com/pepper-iot/tuya-pulsar-sdk-go"
-	"github.com/pepper-iot/tuya-pulsar-sdk-go/pkg/tylog"
 	"github.com/pepper-iot/tuya-pulsar-sdk-go/pkg/tyutils"
+	"github.com/rs/zerolog/log"
 	"github.com/tuya/pulsar-client-go/core/manage"
 )
 
 func main() {
-	// SetInternalLogLevel(logrus.DebugLevel)
-	tylog.SetGlobalLog("sdk", false)
 	accessID := "accessID"
 	accessKey := "accessKey"
 	topic := pulsar.TopicForAccessID(accessID)
@@ -41,23 +39,23 @@ type helloHandler struct {
 }
 
 func (h *helloHandler) HandlePayload(ctx context.Context, msg *pulsar.Message, payload []byte) error {
-	tylog.Info("payload preview", tylog.String("payload", string(payload)))
+	log.Info().Str("payload", string(payload)).Msg("payload preview")
 
 	// let's decode the payload with AES
 	m := map[string]interface{}{}
 	err := json.Unmarshal(payload, &m)
 	if err != nil {
-		tylog.Error("json unmarshal failed", tylog.ErrorField(err))
+		log.Error().Err(err).Msg("json unmarshal failed")
 		return nil
 	}
 	bs := m["data"].(string)
 	de, err := base64.StdEncoding.DecodeString(string(bs))
 	if err != nil {
-		tylog.Error("base64 decode failed", tylog.ErrorField(err))
+		log.Error().Err(err).Msg("base64 decode failed")
 		return nil
 	}
 	decode := tyutils.EcbDecrypt(de, []byte(h.AesSecret))
-	tylog.Info("aes decode", tylog.ByteString("decode payload", decode))
+	log.Info().Str("decode", string(decode)).Msg("decode payload")
 
 	return nil
 }

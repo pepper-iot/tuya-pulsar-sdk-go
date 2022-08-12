@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/pepper-iot/tuya-pulsar-sdk-go/pkg/tylog"
+	"github.com/rs/zerolog/log"
 )
 
 type ConsumerList struct {
@@ -42,7 +42,7 @@ func (l *ConsumerList) CronFlow() {
 		select {
 		case <-l.Stopped:
 			tk.Stop()
-			tylog.Info("stop CronFlow", tylog.String("topic", l.Topic))
+			log.Info().Str("topic", l.Topic).Msg("consumer cron flow stopped")
 			return
 		case <-tk.C:
 			for i := 0; i < len(l.list); i++ {
@@ -51,16 +51,10 @@ func (l *ConsumerList) CronFlow() {
 					continue
 				}
 				if len(c.Overflow) > 0 {
-					tylog.Info("RedeliverOverflow",
-						tylog.Any("topic", c.Topic),
-						tylog.Any("num", len(c.Overflow)),
-					)
+					log.Info().Str("topic", l.Topic).Int("length", len(c.Overflow)).Msg("consumer cron flow overflow")
 					_, err := c.RedeliverOverflow(context.Background())
 					if err != nil {
-						tylog.Warn("RedeliverOverflow failed",
-							tylog.Any("topic", c.Topic),
-							tylog.ErrorField(err),
-						)
+						log.Error().Err(err).Str("topic", l.Topic).Msg("consumer cron flow redeliver overflow failed")
 					}
 				}
 
@@ -69,7 +63,7 @@ func (l *ConsumerList) CronFlow() {
 				}
 				err := c.Flow(l.FlowPermit)
 				if err != nil {
-					tylog.Error("flow failed", tylog.ErrorField(err), tylog.String("topic", c.Topic))
+					log.Error().Err(err).Str("topic", l.Topic).Msg("consumer cron flow failed")
 				}
 			}
 		}
@@ -77,7 +71,7 @@ func (l *ConsumerList) CronFlow() {
 }
 
 func (l *ConsumerList) Stop() {
-	tylog.Info("consumer will stop, waiting...", tylog.String("topic", l.Topic))
+	log.Info().Str("topic", l.Topic).Msg("consumer will stop, waiting...")
 	close(l.Stopped)
 	wg := sync.WaitGroup{}
 	for i := 0; i < len(l.list); i++ {
@@ -89,5 +83,5 @@ func (l *ConsumerList) Stop() {
 		}()
 	}
 	wg.Wait()
-	tylog.Info("consumer stopped", tylog.String("topic", l.Topic))
+	log.Info().Str("topic", l.Topic).Msg("consumer stopped")
 }

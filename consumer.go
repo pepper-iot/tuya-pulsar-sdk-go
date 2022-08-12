@@ -5,9 +5,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"go.uber.org/zap"
-
-	"github.com/pepper-iot/tuya-pulsar-sdk-go/pkg/tylog"
+	"github.com/rs/zerolog/log"
 	"github.com/tuya/pulsar-client-go/core/manage"
 	"github.com/tuya/pulsar-client-go/core/msg"
 )
@@ -30,7 +28,7 @@ func (c *consumerImpl) ReceiveAsync(ctx context.Context, queue chan Message) {
 	go func() {
 		err := c.csm.ReceiveAsync(ctx, queue)
 		if err != nil {
-			tylog.Debug("consumer stopped", tylog.String("topic", c.topic))
+			log.Error().Err(err).Str("topic", c.topic).Msg("consumer stopped")
 		}
 	}()
 }
@@ -51,7 +49,7 @@ func (c *consumerImpl) ReceiveAndHandle(ctx context.Context, handler PayloadHand
 				close(c.stopped)
 				return
 			}
-			tylog.Debug("consumerImpl receive message", tylog.String("topic", c.topic))
+			log.Debug().Str("topic", c.topic).Msg("consumerImpl receive message")
 			bgCtx := context.Background()
 			c.Handler(bgCtx, handler, &m)
 		}
@@ -59,13 +57,13 @@ func (c *consumerImpl) ReceiveAndHandle(ctx context.Context, handler PayloadHand
 }
 
 func (c *consumerImpl) Handler(ctx context.Context, handler PayloadHandler, m *Message) {
-	fields := make([]zap.Field, 0, 10)
-	fields = append(fields, tylog.Any("msgID", m.Msg.GetMessageId()))
-	fields = append(fields, tylog.String("topic", m.Topic))
+	var diag map[string]interface{}
+	diag["msgID"] = m.Msg.GetMessageId()
+	diag["topic"] = m.Topic
 	defer func(start time.Time) {
 		spend := time.Since(start)
-		fields = append(fields, tylog.String("total spend", spend.String()))
-		tylog.Debug("Handler trace info", fields...)
+		diag["totalSpend"] = spend.String()
+		log.Debug().Interface("diag", diag).Msg("Handler trace info")
 	}(time.Now())
 
 	now := time.Now()
@@ -75,29 +73,29 @@ func (c *consumerImpl) Handler(ctx context.Context, handler PayloadHandler, m *M
 	if num > 0 && m.Meta.NumMessagesInBatch != nil {
 		list, err = msg.DecodeBatchMessage(m)
 		if err != nil {
-			tylog.Error("DecodeBatchMessage failed", tylog.ErrorField(err))
+			log.Error().Err(err).Msg("decode batch message error")
 			return
 		}
 	}
 	spend := time.Since(now)
-	fields = append(fields, tylog.String("decode spend", spend.String()))
+	diag["decodeSpend"] = spend.String()
 
 	now = time.Now()
 	if c.csm.Unactive() {
-		tylog.Warn("unused msg because of consumer is unactivated", tylog.Any("payload", string(m.Payload)))
+		log.Warn().Str("payload", string(m.Payload)).Str("topic", m.Topic).Msg("unused msg because of consumer is unactivated")
 		return
 	}
 	spend = time.Since(now)
-	fields = append(fields, tylog.String("Unactive spend", spend.String()))
+	diag["unactiveSpend"] = spend.String()
 
 	idCtx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	now = time.Now()
 	if c.csm.ConsumerID(idCtx) != m.ConsumerID {
-		tylog.Warn("unused msg because of different ConsumerID", tylog.Any("payload", string(m.Payload)))
+		log.Warn().Str("payload", string(m.Payload)).Str("topic", m.Topic).Msg("unused msg because of consumerID is not match")
 		return
 	}
 	spend = time.Since(now)
-	fields = append(fields, tylog.String("ConsumerID spend", spend.String()))
+	diag["consumerIDSpend"] = spend.String()
 	cancel()
 
 	now = time.Now()
@@ -112,11 +110,9 @@ func (c *consumerImpl) Handler(ctx context.Context, handler PayloadHandler, m *M
 		}
 	}
 	spend = time.Since(now)
-	fields = append(fields, tylog.String("HandlePayload spend", spend.String()))
+	diag["handlePayloadSpend"] = spend.String()
 	if err != nil {
-		tylog.Error("handle message failed", tylog.ErrorField(err),
-			tylog.String("topic", m.Topic),
-		)
+		log.Error().Err(err).Str("payload", string(m.Payload)).Str("topic", m.Topic).Msg("handler failed")
 	}
 
 	now = time.Now()
@@ -124,9 +120,9 @@ func (c *consumerImpl) Handler(ctx context.Context, handler PayloadHandler, m *M
 	err = c.csm.Ack(ackCtx, *m)
 	cancel()
 	spend = time.Since(now)
-	fields = append(fields, tylog.String("Ack spend", spend.String()))
+	diag["ackSpend"] = spend.String()
 	if err != nil {
-		tylog.Error("ack failed", tylog.ErrorField(err))
+		log.Error().Err(err).Str("topic", m.Topic).Msg("ack message failed")
 	}
 
 }

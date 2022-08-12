@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/pepper-iot/tuya-pulsar-sdk-go/pkg/tylog"
+	"github.com/rs/zerolog/log"
 
 	"github.com/tuya/pulsar-client-go/core/manage"
 	"github.com/tuya/pulsar-client-go/core/msg"
@@ -64,15 +64,12 @@ func getTenant(topic string) string {
 }
 
 func (c *client) NewConsumer(config ConsumerConfig) (Consumer, error) {
-	tylog.Info("start creating consumer",
-		tylog.String("pulsar", c.Addr),
-		tylog.String("topic", config.Topic),
-	)
+	log.Info().Str("pulsar", c.Addr).Interface("config", config).Msg("start creating consumer")
 
 	errs := make(chan error, 10)
 	go func() {
 		for err := range errs {
-			tylog.Error("async errors", tylog.ErrorField(err))
+			log.Error().Err(err).Msg("error creating consumer")
 		}
 	}()
 	cfg := manage.ConsumerConfig{
@@ -117,10 +114,7 @@ func (c *client) NewConsumer(config ConsumerConfig) (Consumer, error) {
 
 	// single topic
 	mc := manage.NewManagedConsumer(c.pool, cfg)
-	tylog.Info("create consumer success",
-		tylog.String("pulsar", c.Addr),
-		tylog.String("topic", config.Topic),
-	)
+	log.Info().Str("pulsar", c.Addr).Interface("config", config).Msg("created consumer")
 	return &consumerImpl{
 		csm:     mc,
 		topic:   cfg.Topic,

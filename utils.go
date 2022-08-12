@@ -1,7 +1,9 @@
 package pulsar
 
-import "github.com/sirupsen/logrus"
+import (
+	"github.com/pepper-iot/tuya-pulsar-sdk-go/logging"
+)
 
-func SetInternalLogLevel(level logrus.Level) {
-	logrus.SetLevel(level)
+func init() {
+	logging.SetupLogging()
 }
