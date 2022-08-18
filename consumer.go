@@ -5,9 +5,9 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/pepper-iot/pulsar-client-go/core/manage"
+	"github.com/pepper-iot/pulsar-client-go/core/msg"
 	"github.com/rs/zerolog/log"
-	"github.com/tuya/pulsar-client-go/core/manage"
-	"github.com/tuya/pulsar-client-go/core/msg"
 )
 
 type ConsumerConfig struct {

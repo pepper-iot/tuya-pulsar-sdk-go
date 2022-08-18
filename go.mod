@@ -3,9 +3,9 @@ module github.com/pepper-iot/tuya-pulsar-sdk-go
 go 1.18
 
 require (
+	github.com/pepper-iot/pulsar-client-go v0.0.0-20220818013042-c5296cb830f6
 	github.com/rs/zerolog v1.27.0
 	github.com/stretchr/testify v1.7.0
-	github.com/tuya/pulsar-client-go v0.0.0-20201117084529-d7dfa0597559
 	go.elastic.co/ecszerolog v0.1.0
 )
 

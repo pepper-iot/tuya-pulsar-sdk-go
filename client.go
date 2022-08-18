@@ -9,8 +9,8 @@ import (
 
 	"github.com/rs/zerolog/log"
 
-	"github.com/tuya/pulsar-client-go/core/manage"
-	"github.com/tuya/pulsar-client-go/core/msg"
+	"github.com/pepper-iot/pulsar-client-go/core/manage"
+	"github.com/pepper-iot/pulsar-client-go/core/msg"
 )
 
 const (

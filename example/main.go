@@ -5,10 +5,10 @@ import (
 	"encoding/base64"
 	"encoding/json"
 
+	"github.com/pepper-iot/pulsar-client-go/core/manage"
 	pulsar "github.com/pepper-iot/tuya-pulsar-sdk-go"
 	"github.com/pepper-iot/tuya-pulsar-sdk-go/pkg/tyutils"
 	"github.com/rs/zerolog/log"
-	"github.com/tuya/pulsar-client-go/core/manage"
 )
 
 func main() {
