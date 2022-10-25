@@ -1,3 +1,8 @@
+# ARCHIVED!
+
+This repo has been combined into `pepper-tuya-pulsar-listener`!
+
+
 # pulsar-client-go
 
 [English](README.md) | [中文版](README_cn.md)
